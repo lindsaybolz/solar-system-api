@@ -72,7 +72,7 @@ def handle_moons():
         moon_response.append({
             "id": moon.id,
             "name": moon.name,
-            "planet": moon.planet
+            "planet": str(moon.planet)
         })
     return str(moon_response)
 
@@ -83,5 +83,5 @@ def handle_moon(moon_id):
     return jsonify({
         "id": moon.id, 
         "name": moon.name,
-        "planet": moon.planet
+        "planet": str(moon.planet)
     })
