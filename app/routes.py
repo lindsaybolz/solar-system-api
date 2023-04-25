@@ -1,11 +1,5 @@
 from flask import Blueprint, jsonify
-
-class Planet:
-    def __init__(self, id, name, description, mass):
-        self.id = id
-        self.name = name
-        self.description = description
-        self.mass = mass
+from .models.planet import Planet
 
 planets = [
     Planet(1, 'Earth', 'Home planet', 5),
@@ -26,3 +20,4 @@ def handle_planets():
             "mass": planet.mass
         })
     return jsonify(planet_response)
+
