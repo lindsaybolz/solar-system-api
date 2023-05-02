@@ -23,12 +23,10 @@ def validate_planet(planet_id):
     except:
         abort(make_response({"message": f"Planet {planet_id} is not valid."}, 400))
 
-    for planet in planets:
-        if planet_id == planet.id:
-            return planet
-    
-    abort(make_response({"message": "Planet {planet_id} is not found"}, 404))
-
+    planet = Planet.query.get(planet_id)
+    if not planet:   
+        abort(make_response({"message": f"Planet {planet_id} is not found"}, 404))
+    return planet
 
 @planets_bp.route("", methods=["POST"])
 def create_planet():
@@ -75,6 +73,30 @@ def handle_planet(planet_id):
         "mass": planet.mass
     }
 
+@planets_bp.route('/<planet_id>', methods=["PUT"])
+def update_planet(planet_id):
+    request_body = request.get_json()
+    planet = validate_planet(planet_id)
+
+    planet.name = request_body['name']
+    planet.description = request_body['description']
+    planet.mass = request_body['mass']
+
+    db.session.commit()
+
+    return {"message": f"Planet {planet_id} successfully updated."}, 200
+
+@planets_bp.route('/<planet_id>', methods=["DELETE"])
+def delete_planet(planet_id):
+    planet = validate_planet(planet_id)
+
+    db.session.delete(planet)
+    db.session.commit()
+
+    return {"message": f"Planet {planet_id} successfully deleted."}, 200
+
+
+
 def validate_moon(moon_id):
     try:
         moon_id = int(moon_id)
@@ -83,7 +105,7 @@ def validate_moon(moon_id):
 
     moon = Moon.query.get(moon_id)
     if not moon:
-        abort(make_response({"message": "Moon {moon_id} is not found"}, 404))
+        abort(make_response({"message": f"Moon {moon_id} is not found"}, 404))
 
     return moon
 
@@ -109,3 +131,26 @@ def handle_moon(moon_id):
         "name": moon.name,
         "planet": str(moon.planet)
     })
+
+@moons_bp.route('/<moon_id>', methods=["PUT"])
+def update_moon(moon_id):
+    request_body = request.get_json()
+    moon = validate_moon(moon_id)
+
+    moon.name = request_body['name']
+    moon.planet_id = request_body['planet_id']
+
+    db.session.commit()
+
+    return {"message": f"Moon {moon_id} successfully updated."}, 200
+
+
+@moons_bp.route('/<moon_id>', methods=["DELETE"])
+def delete_moon(moon_id):
+    moon = validate_moon(moon_id)
+
+    db.session.delete(moon)
+    db.session.commit()
+
+    return {"message": f"Moon {moon_id} successfully deleted."}, 200
+
