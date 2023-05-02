@@ -1,6 +1,7 @@
-from flask import Blueprint, jsonify, abort, make_response
+from flask import Blueprint, jsonify, abort, make_response, request
 from .models.planet import Planet
 from .models.moon import Moon
+from app import db
 
 # planets = [
 #     Planet(1, 'Earth', 'Home planet', 5),
@@ -29,8 +30,20 @@ def validate_planet(planet_id):
     abort(make_response({"message": "Planet {planet_id} is not found"}, 404))
 
 
+@planets_bp.route("", methods=["POST"])
+def create_planet():
+    request_body = request.get_json()
+    new_planet = Planet(name=request_body["name"], 
+                        description=request_body["description"],
+                        mass=request_body["mass"])
+    db.session.add(new_planet)
+    db.session.commit()
+    return make_response(f"Planet {new_planet.id} successfully created.")
+
 @planets_bp.route("", methods=["GET"])
 def handle_planets():
+    planets = Planet.query.all()
+    
     planet_response = []
     for planet in planets:
         planet_response.append({
