@@ -2,16 +2,16 @@ from flask import Blueprint, jsonify, abort, make_response
 from .models.planet import Planet
 from .models.moon import Moon
 
-planets = [
-    Planet(1, 'Earth', 'Home planet', 5),
-    Planet(2, 'Mars', 'Fire planet', 4),
-    Planet(3, 'Dune', 'Home of the freemen', 9)
-]
-moons = [
-    Moon(1, "Sailor", planets[0]),
-    Moon(2, "Orion", planets[0]),
-    Moon(3, "Olivia", planets[1])
-]
+# planets = [
+#     Planet(1, 'Earth', 'Home planet', 5),
+#     Planet(2, 'Mars', 'Fire planet', 4),
+#     Planet(3, 'Dune', 'Home of the freemen', 9)
+# ]
+# moons = [
+#     Moon(1, "Sailor", planets[0]),
+#     Moon(2, "Orion", planets[0]),
+#     Moon(3, "Olivia", planets[1])
+# ]
 
 planets_bp = Blueprint("planets", __name__, url_prefix="/planets")
 moons_bp = Blueprint("moons", __name__, url_prefix="/moons")
