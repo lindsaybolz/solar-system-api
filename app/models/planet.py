@@ -5,6 +5,7 @@ class Planet(db.Model):
     name = db.Column(db.String)
     description = db.Column(db.String)
     mass = db.Column(db.Integer)
+    moon = db.ForeignKey("planet.moon")
 
 #     def __str__(self):
 #         return str({

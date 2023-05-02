@@ -40,6 +40,16 @@ def create_planet():
     db.session.commit()
     return make_response(f"Planet {new_planet.id} successfully created.")
 
+@moons_bp.route("", methods=["POST"])
+def create_moon():
+    request_body = request.get_json()
+    new_moon = Moon(name=request_body["name"], 
+                        planet_id=request_body["planet_id"])
+    
+    db.session.add(new_moon)
+    db.session.commit()
+    return make_response(f"Moon {new_moon.id} successfully created.")
+
 @planets_bp.route("", methods=["GET"])
 def handle_planets():
     planets = Planet.query.all()
@@ -71,16 +81,17 @@ def validate_moon(moon_id):
     except:
         abort(make_response({"message": f"Moon {moon_id} is not valid."}, 400))
 
-    for moon in moons:
-        if moon_id == moon.id:
-            return moon
-    
-    abort(make_response({"message": "Moon {moon_id} is not found"}, 404))
+    moon = Moon.query.get(moon_id)
+    if not moon:
+        abort(make_response({"message": "Moon {moon_id} is not found"}, 404))
 
+    return moon
 
 @moons_bp.route("", methods=["GET"])
 def handle_moons():
     moon_response = []
+    moons = Moon.query.all()
+
     for moon in moons:
         moon_response.append({
             "id": moon.id,
