@@ -15,7 +15,6 @@ class Planet(db.Model):
             'name': self.name,
             'description': self.description,
             'mass': self.mass,
-            'moon': self.moon
         }
     
     @classmethod

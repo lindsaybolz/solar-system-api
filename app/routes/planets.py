@@ -22,7 +22,11 @@ def validate_model(cls, model_id):
 @planets_bp.route("", methods=["POST"])
 def create_planet():
     request_body = request.get_json()
-    new_planet = Planet.from_dict(request_body)
+    if request_body.get('name') and request_body.get('description') and request_body.get('mass'):
+        new_planet = Planet.from_dict(request_body)
+    else:
+        abort(make_response({"message": f"Planet input data incomplete.  Make sure you ahve a name, description and mass."}, 400))
+
 
     db.session.add(new_planet)
     db.session.commit()
@@ -41,7 +45,7 @@ def handle_planets():
     planet_response = []
     for planet in planets:
         planet_response.append(planet.to_dict())
-    return jsonify(planet_response)
+    return jsonify(planet_response), 200
 
 # route to get planet by ID
 @planets_bp.route("/<planet_id>", methods=["GET"])

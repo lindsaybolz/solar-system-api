@@ -24,7 +24,7 @@ def client(app):
     return app.test_client()     
 
 @pytest.fixture
-def two_saved_planets():   
+def two_saved_planets(client):   
     planet_1 = Planet(
         name = "Earth",
         mass = 5,
