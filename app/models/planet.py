@@ -5,12 +5,12 @@ class Planet(db.Model):
     name = db.Column(db.String)
     description = db.Column(db.String)
     mass = db.Column(db.Integer)
-    moon = db.ForeignKey("planet.moon")
+    moons = db.relationship("Moon", back_populates="planet")
 
-#     def __str__(self):
-#         return str({
-#             "id": self.id,
-#             "name": self.name,
-#             "description": self.description,
-#             "mass": self.mass
-#         })
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "mass": self.mass
+        }

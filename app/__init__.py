@@ -26,5 +26,6 @@ def create_app(test_config=None):
     app.register_blueprint(moons_bp)
     
     from app.models.planet import Planet
+    from app.models.moon import Moon
     
     return app
