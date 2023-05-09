@@ -6,27 +6,32 @@ from app import db
 planets_bp = Blueprint("planets", __name__, url_prefix="/planets")
 
 # helper function
-def validate_planet(planet_id):
+def validate_model(cls, model_id):
     try:
-        planet_id = int(planet_id)
+        model_id = int(model_id)
     except:
-        abort(make_response({"message": f"Planet {planet_id} is not valid."}, 400))
+        abort(make_response({"message": f"{cls.__name__} {model_id} is not valid."}, 400))
 
-    planet = Planet.query.get(planet_id)
-    if not planet:   
-        abort(make_response({"message": f"Planet {planet_id} is not found"}, 404))
-    return planet
+    model = cls.query.get(model_id)
+    if not model:   
+        abort(make_response({"message": f"{cls.__name__} {model_id} is not found"}, 404))
+    
+    return model
 
 # planet routes
 # route to create a planet
 @planets_bp.route("", methods=["POST"])
 def create_planet():
     request_body = request.get_json()
-    new_planet = Planet(name=request_body["name"], 
-                        description=request_body["description"],
-                        mass=request_body["mass"])
+    if request_body.get('name') and request_body.get('description') and request_body.get('mass'):
+        new_planet = Planet.from_dict(request_body)
+    else:
+        abort(make_response({"message": f"Planet input data incomplete.  Make sure you ahve a name, description and mass."}, 400))
+
+
     db.session.add(new_planet)
     db.session.commit()
+
     return jsonify(f"Planet {new_planet.id} successfully created."), 201
 
 # route to get all planets and by filter
@@ -40,31 +45,20 @@ def handle_planets():
     
     planet_response = []
     for planet in planets:
-        planet_response.append({
-            "id": planet.id,
-            "name": planet.name,
-            "description": planet.description,
-            "mass": planet.mass
-        })
-    return jsonify(planet_response)
+        planet_response.append(planet.to_dict())
+    return jsonify(planet_response), 200
 
 # route to get planet by ID
 @planets_bp.route("/<planet_id>", methods=["GET"])
 def handle_planet(planet_id):
-    planet = validate_planet(planet_id)
-
-    return {
-        "id": planet.id, 
-        "name": planet.name,
-        "description": planet.description,
-        "mass": planet.mass
-    }
+    planet = validate_model(Planet, planet_id)
+    return planet.to_dict()
 
 # route to update planet by ID
 @planets_bp.route('/<planet_id>', methods=["PUT"])
 def update_planet(planet_id):
     request_body = request.get_json()
-    planet = validate_planet(planet_id)
+    planet = validate_model(Planet, planet_id)
 
     planet.name = request_body['name']
     planet.description = request_body['description']
@@ -77,7 +71,7 @@ def update_planet(planet_id):
 # route to delete planet by ID
 @planets_bp.route('/<planet_id>', methods=["DELETE"])
 def delete_planet(planet_id):
-    planet = validate_planet(planet_id)
+    planet = validate_model(Planet, planet_id)
 
     db.session.delete(planet)
     db.session.commit()
